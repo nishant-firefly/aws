@@ -1,0 +1,6 @@
+{
+    "SERVICES": "s3,sqs,iam,step",
+    "DEBUG": "1",
+    "DATA_DIR": "./localstack/data"
+  }
+  
