@@ -1,10 +1,11 @@
 import docker
 from docker.errors import DockerException
 import traceback
+from enum import Enum
 
 STRS = {
-    "docker_not_running": "Docker is not running!",
-    "docker_running": "Docker is running!",
+    "service_not_running": "{} is not running!",
+    "service_running": "{} is running!",
 }
 
 def pdm(message: str, width: int = 20) -> None:
@@ -13,6 +14,7 @@ def pdm(message: str, width: int = 20) -> None:
 
 class RunningStatus:
     RUNNING, EXCEPTION, MESSAGE, TRACEBACK = "running", "exception", "message", "traceback"
+
     def __init__(self, running: bool, e: Exception = None, message: str = None) -> None:
         self.running = running
         self.exception = str(e) if e else None
@@ -33,32 +35,41 @@ class RunningStatus:
         yield RunningStatus.EXCEPTION, self.exception
         yield RunningStatus.MESSAGE, self.message
         yield RunningStatus.TRACEBACK, self.traceback
-
+class Service(Enum):
+    DOCKER = "Docker"
+    # Add more services here as needed
 class CheckSystem:
+    EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE= "Defensive Coding: caught in generic exception while checking {service_name}",
+
+    @staticmethod
+    def check_service(service_name: str, check_func) -> RunningStatus:
+        try:
+            check_func()
+            return RunningStatus(True)
+        except Exception as e:
+            return RunningStatus(False, e, message=CheckSystem.EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE)
+
     @staticmethod
     def check_docker() -> RunningStatus:
-        try:
-            client = docker.from_env()
-            client.ping()
-            return RunningStatus(True)
-        except DockerException as e:
-            return RunningStatus(False, e)
-        except Exception as e:
-            return RunningStatus(False, e, message="Defensive Coding: caught in generic exception")
+        return CheckSystem.check_service(Service.DOCKER, lambda: docker.from_env().ping())
 
     @staticmethod
-    def check_system() -> RunningStatus:
-        docker_status = CheckSystem.check_docker()
-        if not docker_status.running:
-            pdm(STRS["docker_not_running"])
-            return docker_status
-        pdm(STRS["docker_running"])
-        return docker_status
+    def check_system() -> dict:
+        services = {
+            Service.DOCKER.value: CheckSystem.check_docker
+            # Add more services here
+        }
+
+        statuses = {name: check() for name, check in services.items()}
+
+        for service_name, status in statuses.items():
+            if not status.running:
+                pdm(STRS["service_not_running"].format(service_name))
+            else:
+                pdm(STRS["service_running"].format(service_name))
+
+        return {service_name: status.to_dict() for service_name, status in statuses.items()}
 
 if __name__ == "__main__":
     status = CheckSystem.check_system()
-    ## dict(status) => *** TypeError: 'RunningStatus' object is not iterable
-    ## Will throw error when running status not iterable
-    ## so make iterable else dict() and __dict__ same 
-    print( dict(status))
-
+    print(status)
