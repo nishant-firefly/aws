@@ -12,24 +12,21 @@ def pdm(message: str, width: int = 20) -> None:
     print(f"{border} {message.center(len(message) + 4)} {border}")
 
 class RunningStatus:
-    RUNNING, EXCEPTION, MESSAGE, TRACEBACK = "running", "exception", "message", "traceback"
-
     def __init__(self, running: bool, e: Exception = None, message: str = None) -> None:
-        self.json = {
-            RunningStatus.RUNNING: running,
-            RunningStatus.EXCEPTION: str(e) if e else None,
-            RunningStatus.MESSAGE: message,
-            RunningStatus.TRACEBACK: traceback.format_exc() if e else None
-        }
+        self.running = running
+        self.exception = str(e) if e else None
+        self.message = message
+        self.traceback = traceback.format_exc() if e else None
 
     def __repr__(self) -> str:
-        return str(self.json)
+        ## or can use self.__dict__ 
+        return str(dict(self))
 
     def __str__(self) -> str:
-        return str(self.json)
+        return str(dict(self))
 
     def to_dict(self) -> dict:
-        return self.json
+        return dict(self)
 
 class CheckSystem:
     @staticmethod
@@ -46,7 +43,7 @@ class CheckSystem:
     @staticmethod
     def check_system() -> RunningStatus:
         docker_status = CheckSystem.check_docker()
-        if not docker_status.json[RunningStatus.RUNNING]:
+        if not docker_status.running:
             pdm(STRS["docker_not_running"])
             return docker_status
         pdm(STRS["docker_running"])
