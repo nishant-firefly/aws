@@ -1,100 +1,114 @@
+import json
 import os
 import random
 import string
-import json
-import argparse
-from dotenv import dotenv_values
-CONFIG_FILE="config.json"
-ENV_FILE=".env"
-class ConfigManager:
-    def __init__(self):
-        # This will always exist and not part of gitigniore
-        with open(CONFIG_FILE, 'r') as config_file:
-            self.config = json.load(config_file)
+
+# Usage
+CONFIG_FILE = 'config.json'
+ENV_FILE = '.env'
+MESSAGES = {
+    ### ConfigToEnvConverter messages 
+    'file_not_found': "Error: The file {filename} does not exist.",
+    'invalid_json': "Error: The file {filename} is not a valid JSON.",
+    'added_settings': "Added settings:",
+    'deleted_settings': "Deleted settings:",
+    'modified_settings': "Modified settings:",
+    'update_prompt': "Do you want to update the .env file? (y/n): ",
+    'write_success': ".env file updated successfully.",
+    'write_error': "Error: Could not write to {filename}.",
+    'no_changes': "No changes detected. No update needed.",
+    'update_canceled': "Update canceled by the user.",
+
+    ### AWSCredentialsGenerator messages 
+    'aws_key_generated': "AWS Access Key and Secret Key generated."
+}
+
+class EnvFileManager:
+    def __init__(self, json_file, env_file):
+        self.json_file = json_file
+        self.env_file = env_file
+
+    def read_json(self):
+        """Reads the JSON file and returns a dictionary of the configuration."""
+        try:
+            with open(self.json_file, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            print(MESSAGES['file_not_found'].format(filename=self.json_file))
+            return None
+        except json.JSONDecodeError:
+            print(MESSAGES['invalid_json'].format(filename=self.json_file))
+            return None
+
+    def read_env(self):
+        """Reads the .env file and returns a dictionary of the configuration."""
+        if not os.path.exists(self.env_file):
+            return {}
+        with open(self.env_file, 'r') as file:
+            return {line.split('=')[0]: line.split('=')[1].strip() for line in file if '=' in line}
+
+    def compare_configs(self, new_config, old_config):
+        """Compares new and old configurations and prints differences."""
+        added = {k: v for k, v in new_config.items() if k not in old_config}
+        deleted = {k: v for k, v in old_config.items() if k not in new_config}
+        modified = {k: v for k, v in new_config.items() if k in old_config and v != old_config[k]}
         
-        # .env file may or may not exists at the first time.
-        # Even if not exist will return and Empty Ordered Dict : OrderedDict()
-        self.env_vars = dotenv_values(ENV_FILE)
-        # e.g. when no .env file :  {'SERVICES': {'config': 's3,sqs,iam,step', 'env': None}, 'DEBUG': {'config': '1', 'env': None}, 'DATA_DIR': {'config': './localstack/data', 'env': None}}
+        if added:
+            print(MESSAGES['added_settings'])
+            for k, v in added.items():
+                print(f"  {k} = {v}")
+        if deleted:
+            print(MESSAGES['deleted_settings'])
+            for k, v in deleted.items():
+                print(f"  {k} = {v}")
+        if modified:
+            print(MESSAGES['modified_settings'])
+            for k, v in modified.items():
+                print(f"  {k}: {old_config[k]} -> {v}")
         
-        self.config_to_env_changes=self.get_config_to_env_changes()
+        return added, deleted, modified
 
-    def get_config_to_env_changes(self):
-        config_to_env_changes = {}
-        for key, value in self.config.items():
-            if self.config.get(key) != self.env_vars.get(key):
-                config_to_env_changes[key] = {"config":value, "env":self.env_vars.get(key)}
-        return config_to_env_changes
+    def write_env(self, config_json):
+        """Writes the configuration to a .env file after checking for changes."""
+        current_config = self.read_env()
+        added, deleted, modified = self.compare_configs(config_json, current_config)
 
-    def generate_aws_access_key_id(self, length=20):
-        chars = string.ascii_uppercase + string.digits
-        return ''.join(random.choice(chars) for _ in range(length))
-
-    def generate_aws_secret_access_key(self, length=40):
-        chars = string.ascii_uppercase + string.digits + string.ascii_lowercase
-        return ''.join(random.choice(chars) for _ in range(length))
-
-
-    def write_to_env_file(self, force_env=False):
-        # Check if .env file exists and handle --force-env option
-        if os.path.exists(".env") and not force_env:
-            print(".env file already exists. Use --force-env to overwrite.")
-            return False
-
-        print("Writing keys and environment variables to .env file")
-
-        # Generate AWS access keys
-        access_key_id = self.generate_aws_access_key_id()
-        secret_access_key = self.generate_aws_secret_access_key()
-        print(f"AWS Access Key ID: {access_key_id}")
-        print(f"AWS Secret Access Key: {secret_access_key}")
-
-        # Update environment variables with config values
-        for key in self.config.keys():
-            self.env_vars[key] = self.config[key]
-
-        # Add AWS keys to environment variables
-        self.env_vars["AWS_ACCESS_KEY_ID"] = access_key_id
-        self.env_vars["AWS_SECRET_ACCESS_KEY"] = secret_access_key
-
-        # Write to .env file
-        with open(".env", 'w') as f:
-            for key, value in self.env_vars.items():
-                f.write(f"{key}={value}\n")
-
-        return True
-
-
-
-    def generate_keys_and_save_to_env(self, force_env=False, force_config=False):
-        self.read_config()
-        self.read_env()
-
-        # Handle .env file
-        env_overwritten = self.write_to_env_file(force_env=force_env)
-        if not env_overwritten:
-            return
-
-        # Handle config.json changes
-        if self.detect_config_changes():
-            if not force_config:
-                print("Config.json has been modified. Use --force-config to update .env accordingly.")
-                return
-
-            # Update .env if force_config is True
-            self.write_to_env_file(force_env=True)
-            print("config.json and .env updated successfully.")
-
+        if added or deleted or modified:
+            if input(MESSAGES['update_prompt']).lower() == 'y':
+                try:
+                    with open(self.env_file, 'w') as file:
+                        for key, value in {**current_config, **config_json}.items():
+                            file.write(f'{key}={value}\n')
+                    print(MESSAGES['write_success'])
+                except IOError:
+                    print(MESSAGES['write_error'].format(filename=self.env_file))
+            else:
+                print(MESSAGES['update_canceled'])
         else:
-            print("Values in config.json match current .env file.")
+            print(MESSAGES['no_changes'])
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(description="Generate AWS keys and update environment variables.")
-    parser.add_argument('--force-env', action='store_true', help='Force overwrite .env file if it exists.')
-    parser.add_argument('--force-config', action='store_true', help='Force modify config.json.')
-    return parser.parse_args()
 
-if __name__ == "__main__":
-    args = parse_arguments()
-    config_manager = ConfigManager()
-    config_manager.generate_keys_and_save_to_env(force_env=args.force_env, force_config=args.force_config)
+class ConfigToEnvConverter(EnvFileManager):
+    def convert(self):
+        """Converts the JSON configuration to a .env file."""
+        config = self.read_json()
+        if config is not None:
+            self.write_env(config)
+
+
+class AWSCredentialsGenerator(EnvFileManager):
+    def generate_credentials(self):
+        """Simulates generating AWS credentials."""
+        access_key = 'AKIA' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
+        secret_key = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=40))
+        print(MESSAGES['aws_key_generated'])
+        return {
+            'AWS_ACCESS_KEY_ID': access_key,
+            'AWS_SECRET_ACCESS_KEY': secret_key
+        }
+
+if __name__=="__main__":
+    converter = ConfigToEnvConverter(CONFIG_FILE, ENV_FILE)
+    converter.convert()
+    creds = AWSCredentialsGenerator(CONFIG_FILE, ENV_FILE).generate_credentials()
+    converter.write_env(creds)

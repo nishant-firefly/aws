@@ -16,5 +16,5 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     volumes:
-      - "./localstack/data:/tmp/data"
+      - "${DATA_DIR}:/tmp/data"
     restart: unless-stopped
