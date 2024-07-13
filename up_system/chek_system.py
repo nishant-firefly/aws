@@ -19,14 +19,13 @@ class RunningStatus:
         self.traceback = traceback.format_exc() if e else None
 
     def __repr__(self) -> str:
-        ## or can use self.__dict__ 
-        return str(dict(self))
+        return str(self.__dict__)
 
     def __str__(self) -> str:
-        return str(dict(self))
+        return str(self.__dict__)
 
     def to_dict(self) -> dict:
-        return dict(self)
+        return self.__dict__
 
 class CheckSystem:
     @staticmethod
@@ -51,5 +50,5 @@ class CheckSystem:
 
 if __name__ == "__main__":
     status = CheckSystem.check_system()
-    breakpoint()
+    ## dict(status) => *** TypeError: 'RunningStatus' object is not iterable
     print(str(status))
