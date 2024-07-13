@@ -65,6 +65,5 @@ This Python script `check_system.py` checks the status of various services, in a
     - IAM
 ```bash
 cd path/to/up_system
->>>>>>> d1fe390ba01183d6c509859c559a987b7dad614d
 python check_system.py
 ``` 
