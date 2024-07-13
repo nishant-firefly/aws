@@ -63,6 +63,6 @@ This Python script `check_system.py` checks the status of various services, in a
 3. AWS Services [TODO]
     - S3
     - IAM
-   ```sh
+```sh
 python check_system.py
 ``` 

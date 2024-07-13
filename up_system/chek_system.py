@@ -3,10 +3,7 @@ from docker.errors import DockerException
 import traceback
 from enum import Enum
 
-STRS = {
-    "service_not_running": "{} is not running!",
-    "service_running": "{} is running!",
-}
+
 
 def pdm(message: str, width: int = 20) -> None:
     border = '=' * width
@@ -39,6 +36,11 @@ class Service(Enum):
     DOCKER = "Docker"
     # Add more services here as needed
 class CheckSystem:
+
+    class ServiceStatusMessage(Enum):
+        SERVICE_NOT_RUNNING = "{} is not running!"
+        SERVICE_RUNNING = "{} is running!"
+
     EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE= "Defensive Coding: caught in generic exception while checking {service_name}",
 
     @staticmethod
@@ -64,9 +66,9 @@ class CheckSystem:
 
         for service_name, status in statuses.items():
             if not status.running:
-                pdm(STRS["service_not_running"].format(service_name))
+                pdm(CheckSystem.ServiceStatusMessage.SERVICE_NOT_RUNNING.value.format(service_name))
             else:
-                pdm(STRS["service_running"].format(service_name))
+                pdm(CheckSystem.ServiceStatusMessage.SERVICE_RUNNING.value.format(service_name))
 
         return {service_name: status.to_dict() for service_name, status in statuses.items()}
 
