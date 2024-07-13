@@ -12,6 +12,7 @@ def pdm(message: str, width: int = 20) -> None:
     print(f"{border} {message.center(len(message) + 4)} {border}")
 
 class RunningStatus:
+    RUNNING, EXCEPTION, MESSAGE, TRACEBACK = "running", "exception", "message", "traceback"
     def __init__(self, running: bool, e: Exception = None, message: str = None) -> None:
         self.running = running
         self.exception = str(e) if e else None
@@ -19,13 +20,19 @@ class RunningStatus:
         self.traceback = traceback.format_exc() if e else None
 
     def __repr__(self) -> str:
-        return str(self.__dict__)
+        return str(dict(self))
 
     def __str__(self) -> str:
-        return str(self.__dict__)
+        return str(dict(self))
 
     def to_dict(self) -> dict:
-        return self.__dict__
+        return dict(self)
+
+    def __iter__(self):
+        yield RunningStatus.RUNNING, self.running
+        yield RunningStatus.EXCEPTION, self.exception
+        yield RunningStatus.MESSAGE, self.message
+        yield RunningStatus.TRACEBACK, self.traceback
 
 class CheckSystem:
     @staticmethod
@@ -51,4 +58,7 @@ class CheckSystem:
 if __name__ == "__main__":
     status = CheckSystem.check_system()
     ## dict(status) => *** TypeError: 'RunningStatus' object is not iterable
-    print(str(status))
+    ## Will throw error when running status not iterable
+    ## so make iterable else dict() and __dict__ same 
+    print( dict(status))
+
