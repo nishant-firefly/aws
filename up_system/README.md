@@ -64,5 +64,6 @@ This Python script `check_system.py` checks the status of various services, in a
     - S3
     - IAM
 ```bash
+cd path/to/up_system
 python check_system.py
 ``` 
