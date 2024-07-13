@@ -34,6 +34,8 @@ class RunningStatus:
         yield RunningStatus.TRACEBACK, self.traceback
 class Service(Enum):
     DOCKER = "Docker"
+    LOCALSTACK = "Localstack"
+
     # Add more services here as needed
 class CheckSystem:
 
@@ -41,7 +43,7 @@ class CheckSystem:
         SERVICE_NOT_RUNNING = "{} is not running!"
         SERVICE_RUNNING = "{} is running!"
 
-    EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE= "Defensive Coding: caught in generic exception while checking {service_name}",
+    EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE= "Defensive Coding: caught in generic exception while checking {}"
 
     @staticmethod
     def check_service(service_name: str, check_func) -> RunningStatus:
@@ -49,16 +51,21 @@ class CheckSystem:
             check_func()
             return RunningStatus(True)
         except Exception as e:
-            return RunningStatus(False, e, message=CheckSystem.EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE)
+            return RunningStatus(False, e, message=CheckSystem.EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE.format(service_name))
 
     @staticmethod
     def check_docker() -> RunningStatus:
         return CheckSystem.check_service(Service.DOCKER, lambda: docker.from_env().ping())
 
     @staticmethod
+    def check_local_stack() -> RunningStatus:
+        return CheckSystem.check_service(Service.LOCALSTACK, False)
+
+    @staticmethod
     def check_system() -> dict:
         services = {
-            Service.DOCKER.value: CheckSystem.check_docker
+            Service.DOCKER.value: CheckSystem.check_docker,
+            Service.LOCALSTACK.value:CheckSystem.check_local_stack
             # Add more services here
         }
 
