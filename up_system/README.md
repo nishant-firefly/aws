@@ -53,3 +53,16 @@ cd path/to/up_system
 # Update configuration in the .env file
 python generate_env.py
 ```
+
+
+# Service Status Checker (check_system.py)
+
+This Python script `check_system.py` checks the status of various services, in a sequence:
+1. Docker
+2. Localstack [TODO]
+3. AWS Services [TODO]
+    - S3
+    - IAM
+   ```sh
+python check_system.py
+``` 
