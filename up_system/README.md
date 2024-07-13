@@ -14,6 +14,13 @@ For a detailed installation guide for LocalStack, please refer to our [Installat
 
 Before you begin using the system, you need to generate a `.env` file that will store your AWS credentials and other configuration settings from `config.json`. This is a one-time setup process, necessary for initializing your environment.
 
+#### Install Dependencies 
+```bash
+# Assuming python3.11+ is installed 
+cd path/to/up_system
+## Can create virual environment and run 
+python -m pip install -r requirements.txt
+```
 #### Generate AWS Credentials and Configuration
 
 To create the `.env` file with AWS secrets, keys, and configurations, run the following command. This will setup the initial configuration and generate new AWS credentials:
