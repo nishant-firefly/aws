@@ -1,26 +1,48 @@
 # Set Up System
 
-## Install localstack with Docker
-Refer: 
-[Installation Document](https://docs.google.com/document/d/1o_DJDGDltexrNTf4f1FwmJNnVJGHw6XuyiyKcsxeGN4/edit?usp=sharing)
+Welcome to the setup guide for our system. This document provides instructions for setting up your local environment using LocalStack and Docker. Please follow the steps outlined below to configure and start your services.
 
-### One time activity to generate environment variables 
-#### Following will create a .env file with aws secret, keys and configs from config.json
+## Installation
+
+### LocalStack with Docker
+
+For a detailed installation guide for LocalStack, please refer to our [Installation Document](https://docs.google.com/document/d/1o_DJDGDltexrNTf4f1FwmJNnVJGHw6XuyiyKcsxeGN4/edit?usp=sharing).
+
+## Configuration
+
+### One-Time Setup: Generating Environment Variables
+
+Before you begin using the system, you need to generate a `.env` file that will store your AWS credentials and other configuration settings from `config.json`. This is a one-time setup process, necessary for initializing your environment.
+
+#### Generate AWS Credentials and Configuration
+
+To create the `.env` file with AWS secrets, keys, and configurations, run the following command. This will setup the initial configuration and generate new AWS credentials:
+
 ```bash
--- One Time Activity to create .env file from config.json and generate AWS CREDS (Will be used in localstack docker compose)
-path/to/up_system $ python generate_env.py --change-aws-creds
+# Navigate to the system setup directory
+cd path/to/up_system
 
-```
-#### Next time onwards to update the config.json values to .env just run 
-```
-path/to/up_system $ python generate_env.py
-
+# Generate environment variables and AWS credentials
+python generate_env.py --change-aws-creds
 ```
 
+## Running the System
+Once the configuration is in place, you can start LocalStack to simulate the AWS environment on your local machine:
 
+### Start LocalStack services with Docker Compose 
+```bash
+# Navigate to the LocalStack directory
+cd path/to/up_system
+docker-compose up
+```
 
-## Start Localstack
+### Routine Configuration Updates
+If you need to update the values from config.json into the .env file after the initial setup, you can do so by running the following command:
 
-cd localstack 
-docker-compose up 
+```bash
+# Navigate to the system setup directory
+cd path/to/up_system
 
+# Update configuration in the .env file
+python generate_env.py
+```
