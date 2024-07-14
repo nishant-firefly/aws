@@ -1,7 +1,8 @@
 import traceback
 from enum import Enum
-
+PRINT_PDM=False
 def pdm(message: str, width: int = 20) -> None:
+    if not PRINT_PDM: return 
     border = '=' * width
     print(f"{border} {message.center(len(message) + 4)} {border}")
 

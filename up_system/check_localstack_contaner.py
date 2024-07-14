@@ -30,7 +30,6 @@ class LocalstackManager:
             container = self.client.containers.get(container_name)
             if container.status == 'running':
                 pdm(LocalstackMessages.CONTAINER_RUNNING.value.format(container_name=container_name))
-                print("Returning True")
                 return True
             else:
                 pdm(LocalstackMessages.CONTAINER_NOT_RUNNING.value.format(container_name=container_name, status=container.status))
