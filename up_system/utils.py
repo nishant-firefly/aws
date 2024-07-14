@@ -30,22 +30,13 @@ class RunningStatus:
         yield RunningStatus.TRACEBACK, self.traceback
 
 class CheckSystem:
-    def __init__(self, services_check_map) -> None:
-        self.services_check_map=services_check_map
-
+    EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE= "Defensive Coding: caught in generic exception while checking {}"
     class ServiceStatusMessage(Enum):
         SERVICE_NOT_RUNNING = "{} is not running!"
         SERVICE_RUNNING = "{} is running!"
 
-    EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE= "Defensive Coding: caught in generic exception while checking {}"
-
-    @staticmethod
-    def check_service(service_name: str, check_func) -> RunningStatus:
-        try:
-            check_func()
-            return RunningStatus(True)
-        except Exception as e:
-            return RunningStatus(False, e, message=CheckSystem.EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE.format(service_name))
+    def __init__(self, services_check_map) -> None:
+        self.services_check_map=services_check_map
 
     def check_system(self) -> dict:
         statuses = {name: check() for name, check in self.services_check_map.items()}
