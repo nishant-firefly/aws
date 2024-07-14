@@ -9,9 +9,9 @@ python check_services.py
 # {'Docker': {'running': True}, 'Localstack': {'running': True}}
 ```
 ### Prerequisite
-
+```markdown
 The file `up_system/.env` should be available after running `generate_env.py` as mentioned in [Generate AWS Credentials and Configuration](up_system/README.md#generate-aws-credentials-and-configuration).
-
+```
 
 ## 
 
