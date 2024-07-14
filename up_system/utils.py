@@ -36,13 +36,18 @@ class RunningStatus:
         yield RunningStatus.TRACEBACK, self.traceback
 
 class CheckSystem:
+    
     EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE= "Defensive Coding: caught in generic exception while checking {}"
+
+
     class ServiceStatusMessage(Enum):
         SERVICE_NOT_RUNNING = "{} is not running!"
         SERVICE_RUNNING = "{} is running!"
 
-    def __init__(self, services_check_map) -> None:
-        self.services_check_map=services_check_map
+    def __init__(self, SERVICES_LIST) -> None:
+        # TODO: Move out and resolve cyclic import error.
+        from services_map import SERVICES_MAP
+        self.services_check_map={k:v for k,v in SERVICES_MAP.items() if k in SERVICES_LIST}
 
     def check_system(self) -> dict:
         statuses = {name: check() for name, check in self.services_check_map.items()}
