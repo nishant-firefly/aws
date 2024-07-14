@@ -1,6 +1,4 @@
-from up_system.utils import CheckSystem
-from up_system.services_map import DOCKER_LOCALSTACK
+from up_system.chek_system import CheckDockerLocalstack
 
 if __name__=="__main__":
-    status = CheckSystem(DOCKER_LOCALSTACK).check_system()
-    print(status)
+    print(CheckDockerLocalstack())
