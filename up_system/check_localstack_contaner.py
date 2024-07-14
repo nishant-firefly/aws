@@ -1,4 +1,5 @@
 import yaml
+import os
 import docker
 from dotenv import load_dotenv
 from utils import pdm
@@ -7,7 +8,7 @@ from utils import RunningStatus
 from enum import Enum
 import docker
 from docker.errors import DockerException
-
+from __init__ import parent_dir 
 
 # Load environment variables from .env file
 load_dotenv('.env')
@@ -19,8 +20,8 @@ class LocalstackMessages(Enum):
     API_ERROR = "Error checking container status: {error}"
 
 class LocalstackManager:
-    def __init__(self, compose_file='docker-compose.yml'):
-        self.compose_file = compose_file
+    def __init__(self, compose_file_name='docker-compose.yml'):
+        self.compose_file = os.path.join(parent_dir, compose_file_name)
         self.client = docker.from_env()
 
     def read_docker_compose(self):

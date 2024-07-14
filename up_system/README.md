@@ -59,10 +59,11 @@ python generate_env.py
 
 This Python script `check_system.py` checks the status of various services, in a sequence:
 1. Docker
-2. Localstack [TODO]
+2. Localstack 
 3. AWS Services [TODO]
     - S3
     - IAM
+    - etc.
 ```bash
 cd path/to/up_system
 python check_system.py
