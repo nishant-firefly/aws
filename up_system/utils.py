@@ -16,13 +16,18 @@ class RunningStatus:
         self.traceback = traceback.format_exc() if e else None
 
     def __repr__(self) -> str:
+
         return str(dict(self))
 
     def __str__(self) -> str:
         return str(dict(self))
 
     def to_dict(self) -> dict:
-        return dict(self)
+        loc_dict=dict(self)
+        if loc_dict['running']==True:
+            # If status running do not show None messages, exceptions etc.
+            return {k:v for k,v in loc_dict.items() if v}
+        return loc_dict
 
     def __iter__(self):
         yield RunningStatus.RUNNING, self.running

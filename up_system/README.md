@@ -66,4 +66,7 @@ This Python script `check_system.py` checks the status of various services, in a
 ```bash
 cd path/to/up_system
 python check_system.py
-``` 
+```
+
+![Here we can see the output if services are up or down or both](check_system_output.png)
+
