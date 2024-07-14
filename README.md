@@ -10,7 +10,7 @@ python check_services.py
 ```
 ### Prerequisite
 
-The file `up_system/.env` should be available after running `generate_env.py` as mentioned in [up_system/README.md](up_system/README.md).
+The file `up_system/.env` should be available after running `generate_env.py` as mentioned in [up_system/README.md](up_system/README.md#generate-aws-credentials-and-configuration).
 
 
 ## 
