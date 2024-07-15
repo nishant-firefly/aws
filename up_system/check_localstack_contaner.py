@@ -2,13 +2,10 @@ import yaml
 import os
 import docker
 from dotenv import load_dotenv
-from utils import pdm
 from enum import Enum
-from utils import RunningStatus
-from enum import Enum
-import docker
+from utils import RunningStatus, Service
 from docker.errors import DockerException
-from __init__ import parent_dir 
+from __init__ import parent_dir, pdm
 
 # Load environment variables from .env file
 load_dotenv('.env')
@@ -19,7 +16,7 @@ class LocalstackMessages(Enum):
     CONTAINER_NOT_FOUND = "Container '{container_name}' not found."
     API_ERROR = "Error checking container status: {error}"
 
-class LocalstackManager:
+class LocalstackService(Service):
     def __init__(self, compose_file_name='docker-compose.yml'):
         self.compose_file = os.path.join(parent_dir, compose_file_name)
         self.client = docker.from_env()
@@ -47,10 +44,15 @@ class LocalstackManager:
             pdm(LocalstackMessages.API_ERROR.value.format(error=str(e)))
             return RunningStatus(False,e)
         
-    def check_docker(self) -> RunningStatus:
-        ## TODO : This is simple code, Exceptional hanling needed, Refer commit : 
-        ##**1 e.g in https://github.com/nishant-firefly/aws/compare/861a107bd738bd428bb98a984d845701db890013...8d6d74459c180cc1961690318227113f627dc328
-        ############ see the function check_docker 
+    def check(self) -> RunningStatus:
+        """Read Docker Compose configuration and check container status"""
+        # TODO: Handle following 2 lines if issue
+        compose_config = self.read_docker_compose()
+        container_name = compose_config['services']['localstack']['container_name']
+        return self.check_container_status(container_name)
+
+class DockerService(Service):
+    def check(self) -> RunningStatus:
         try:
             client = docker.from_env()
             client.ping()
@@ -60,12 +62,3 @@ class LocalstackManager:
         except Exception as e:
             return RunningStatus(False, e, message="Defensive Coding, caught in generic exception")
 
-    def check_localstack(self) -> RunningStatus:
-        """Read Docker Compose configuration and check container status"""
-        # TODO: Handle following 2 lines if issue
-        compose_config = self.read_docker_compose()
-        container_name = compose_config['services']['localstack']['container_name']
-        return self.check_container_status(container_name)
-
-if __name__ == "__main__":
-    LocalstackManager().check_localstack()

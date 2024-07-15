@@ -1,10 +1,7 @@
 import traceback
 from enum import Enum
-PRINT_PDM=False
-def pdm(message: str, width: int = 20) -> None:
-    if not PRINT_PDM: return 
-    border = '=' * width
-    print(f"{border} {message.center(len(message) + 4)} {border}")
+from abc import abstractmethod, ABC
+from __init__ import pdm
 
 class RunningStatus:
     RUNNING, EXCEPTION, MESSAGE, TRACEBACK = "running", "exception", "message", "traceback"
@@ -34,29 +31,34 @@ class RunningStatus:
         yield RunningStatus.EXCEPTION, self.exception
         yield RunningStatus.MESSAGE, self.message
         yield RunningStatus.TRACEBACK, self.traceback
-
-class CheckSystem:
+class Service(ABC):
+    @abstractmethod
+    def check(self) -> RunningStatus:
+        pass
+class CheckService:
     
     EXC_MSG_DEFENSIVE_CODE_FOR_SERVICE= "Defensive Coding: caught in generic exception while checking {}"
-
-
-    class ServiceStatusMessage(Enum):
-        SERVICE_NOT_RUNNING = "{} is not running!"
-        SERVICE_RUNNING = "{} is running!"
 
     def __init__(self, SERVICES_LIST) -> None:
         # TODO: Move out and resolve cyclic import error.
         from services_map import SERVICES_MAP
         self.services_check_map={k:v for k,v in SERVICES_MAP.items() if k in SERVICES_LIST}
 
-    def check_system(self) -> dict:
-        statuses = {name: check() for name, check in self.services_check_map.items()}
+
+    class ServiceStatusMessage(Enum):
+        SERVICE_NOT_RUNNING = "{} is not running!"
+        SERVICE_RUNNING = "{} is running!"
+
+    def check_service(self) -> dict:
+
+        statuses = {name: getattr(service_class(),'check')() for name, service_class in self.services_check_map.items()}
         for service_name, status in statuses.items():
             if not status.running:
-                pdm(CheckSystem.ServiceStatusMessage.SERVICE_NOT_RUNNING.value.format(service_name))
+                pdm(CheckService.ServiceStatusMessage.SERVICE_NOT_RUNNING.value.format(service_name))
             else:
-                pdm(CheckSystem.ServiceStatusMessage.SERVICE_RUNNING.value.format(service_name))
+                pdm(CheckService.ServiceStatusMessage.SERVICE_RUNNING.value.format(service_name))
         return {service_name: status.to_dict() for service_name, status in statuses.items()}
+
     
 
 

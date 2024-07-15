@@ -1,8 +1,8 @@
-from utils import CheckSystem
+from utils import CheckService
 from services_map import DOCKER_LOCALSTACK
 
 def CheckDockerLocalstack():
-    return CheckSystem(DOCKER_LOCALSTACK).check_system()
+    return CheckService(DOCKER_LOCALSTACK).check_service()
 
 if __name__=="__main__":
     print(CheckDockerLocalstack())
