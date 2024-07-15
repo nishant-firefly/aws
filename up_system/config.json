@@ -2,5 +2,6 @@
     "SERVICES": "s3,iam, step",
     "DEBUG1": "1",
     "DATA_DIR": "./localstack_data/",
-    "LOCALSTACK_ENDPOINT":"http://localhost:4566"
+    "LOCALSTACK_ENDPOINT":"http://localhost:4566",
+    "REGION_NAME":"us-east-1"
 }
