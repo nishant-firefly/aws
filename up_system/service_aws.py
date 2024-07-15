@@ -11,4 +11,17 @@ class AwsService:
             "region_name": envs.get("REGION_NAME"),
             "endpoint_url": f"{envs.get("LOCALSTACK_ENDPOINT")}/{service_name}"
         })
+    def create(self, *args, **kwargs):
+        raise NotImplementedError("Create method not implemented")
 
+    def read(self, *args, **kwargs):
+        raise NotImplementedError("Read method not implemented")
+
+    def update(self, *args, **kwargs):
+        raise NotImplementedError("Update method not implemented")
+
+    def delete(self, *args, **kwargs):
+        raise NotImplementedError("Delete method not implemented")
+
+    def list(self, *args, **kwargs):
+        raise NotImplementedError("List method not implemented")
