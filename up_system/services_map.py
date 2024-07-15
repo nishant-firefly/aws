@@ -1,4 +1,4 @@
-from check_localstack_contaner import LocalstackService, DockerService
+from service_localstack_docker import LocalstackService, DockerService
 from enum import Enum
 class ServiceConst(Enum):
     Docker="Docker"
