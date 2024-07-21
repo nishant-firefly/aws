@@ -16,4 +16,18 @@ The file `up_system/.env` should be available after running `generate_env.py` as
 
 ## 
 
+https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code
+
+
+https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/stepfunctions
+
+## References
+ - [AWS SDK PYTON ](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/)
+ - [AWS SDK PYTON  STEP FUNCTIONS](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/stepfunctions)
+ - - [AWS PYTON  STEP FUNCTIONS FOR Data Scientists ](https://github.com/aws/aws-step-functions-data-science-sdk-python)
+
+
+
+
+
 
