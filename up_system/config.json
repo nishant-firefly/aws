@@ -1,5 +1,5 @@
 {
-    "SERVICES": "s3,iam, step",
+    "SERVICES": "s3,iam, stepfunctions",
     "DEBUG": "1",
     "DATA_DIR": "./localstack_data/",
     "LOCALSTACK_ENDPOINT":"http://localhost:4566",
