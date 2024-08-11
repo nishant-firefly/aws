@@ -5,7 +5,7 @@ However, experimenting with these services can be costly. LocalStack allows you 
 Will use Python to test AWS services locally.
 
 ## System Up and Running for Services 
-[Follow thisto set up the system](up_system/README.md).
+[Follow this to run and test the aws serivces locally](up_system/README.md).
 
 
 
