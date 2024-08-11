@@ -1,3 +1,4 @@
+breakpoint()
 from varni.utils.aws.env_clients import get_aws_service_clients
 import os 
 from dotenv import load_dotenv
