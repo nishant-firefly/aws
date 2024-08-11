@@ -54,20 +54,57 @@ cd path/to/up_system
 python generate_env.py
 ```
 
+# Test the services status
 
-# Service Status Checker (check_system.py)
+## Install AWS CLI
 
-This Python script `check_system.py` checks the status of various services, in a sequence:
-1. Docker
-2. Localstack 
-3. AWS Services [TODO]
-    - S3
-    - IAM
-    - etc.
-```bash
-cd path/to/up_system
-python check_system.py
-```
+1. **Visit the AWS CLI Installation Guide:**
+   Go to the official AWS CLI installation guide for detailed instructions:
+   [AWS CLI Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
-![Here we can see the output if services are up or down or both](check_system_output.png)
+2. **Follow the Instructions:**
+   Follow the installation instructions specific to your operating system as provided in the guide.
+3. **Verify Installation:**
 
+   To verify that AWS CLI has been installed correctly, open your terminal or command prompt and run:
+
+   ```bash
+   aws --version
+   ```
+4. **Check Services:**
+
+   4.1 To get the help text:
+
+   ```bash
+   python check_services.py -h 
+   ```
+   
+   Help Details with all examples.
+
+   4.2 To check the status of AWS services, use the following command:
+
+   ```bash
+   python check_services.py <services>
+   ```
+   Replace <services> with a comma-separated list of the services you want to check. Available services are: s3, lambda, stepfunctions, dynamodb, iam.
+   ```
+   aws\up_system$ python3 check_services.py fakeservice,stepfunctions,s3,lambda,dynamodb
+    Service 'fakeservice' is not supported.
+    Checking stepfunctions...
+    Stepfunctions service is running. Output:
+    {
+        "stateMachines": []
+    }
+
+    Checking s3...
+    S3 service is running but no data found.
+    Checking lambda...
+    Lambda service is running. Output:
+    {
+        "Functions": []
+    }
+
+    Checking dynamodb...
+    Error occurred: An error occurred (InternalFailure) when calling the ListTables operation: Service 'dynamodb' is not enabled. Please check your 'SERVICES' configuration variable.
+
+   ```
