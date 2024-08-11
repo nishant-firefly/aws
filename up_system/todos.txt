@@ -1,0 +1,5 @@
+CLean Up 
+Move in Varni 
+Path append in __init__ and test after that 
+Volume data from .env and not hard coded in project dir and ignore git data 
+Make Production Ready
