@@ -1,6 +1,3 @@
-1# python generate_secrets.py 
-2# docker-compose up 
-3# Copy environment variables from .env and delete it 
 
 ############ 
 # Removes all stopped containers.
