@@ -5,8 +5,6 @@
 import boto3
 import os
 from dotenv import load_dotenv
-from step.examples_aws.hello_step_functions import hello_stepfunctions
-
 
 def hello_stepfunctions(stepfunctions_client):
     """
