@@ -1,5 +1,5 @@
 {
-    "SERVICES": "s3,iam, stepfunctions, lambda",
+    "SERVICES": "s3,iam, stepfunctions, lambda, dynamodb",
     "DEBUG": "1",
     "DATA_DIR": "./localstack_data/",
     "LOCALSTACK_ENDPOINT":"http://localhost:4566",
