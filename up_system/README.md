@@ -1,6 +1,6 @@
 # Set Up System
 
-Welcome to the setup guide for our system. This document provides instructions for setting up your local environment using LocalStack and Docker. Please follow the steps outlined below to configure and start your services.
+Welcome to the setup guide. This document provides instructions for setting up your local environment using LocalStack, Python and Docker. Please follow the steps outlined below to configure and start your services.
 
 ## Installation
 
