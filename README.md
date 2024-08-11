@@ -4,7 +4,7 @@ AWS is a leading cloud platform offering a vast range of services, providing end
 However, experimenting with these services can be costly. LocalStack allows you to simulate AWS services locally, saving costs during development and testing. 
 Will use Python to test AWS services locally.
 
-## System Up and Running for Services 
+## System Set Up
 [Follow this to run and test the aws serivces locally](up_system/README.md).
 
 
