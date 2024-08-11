@@ -2,7 +2,7 @@
 
 AWS is a leading cloud platform offering a vast range of services, providing endless opportunities for innovation and scalability. 
 However, experimenting with these services can be costly. LocalStack allows you to simulate AWS services locally, saving costs during development and testing. 
-Will use Python, Loclstack(Dockerized) to help run and test AWS services locally.
+Will use Python to test AWS services locally.
 
 **Prerequisite: Nothing :) will ensure you understand everything**
 ## Check System
