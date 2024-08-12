@@ -17,9 +17,10 @@ Before you begin using the system, you need to generate a `.env` file that will 
 #### Install Dependencies 
 ```bash
 # Assuming python3.11+ is installed 
-cd path/to/up_system
+cd path/to/aws # root folder 
 ## Can create virual environment and run 
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
+pip install packages/varni
 ```
 #### Generate AWS Credentials and Configuration
 
@@ -92,7 +93,48 @@ python generate_env.py
     Service 'fakeservice' is not supported.
     Checking stepfunctions...
     Stepfunctions service is running. Output:
-    {
+    {# Test the Services Status
+
+## Install AWS CLI
+
+1. **Visit the AWS CLI Installation Guide:**
+   Go to the official AWS CLI installation guide for detailed instructions:
+   [AWS CLI Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+
+2. **Follow the Instructions:**
+   Follow the installation instructions specific to your operating system as provided in the guide.
+
+3. **Verify Installation:**
+
+   To verify that AWS CLI has been installed correctly, open your terminal or command prompt and run:
+
+   ```bash
+   aws --version
+   ```
+4. **Check Serrvices Examples:**
+
+   4.1 Help Text:
+   To display the help text and available commands, run:
+   ```bash
+   python check_services.py -h
+   ```
+   This will show you how to use the script and the available options.
+
+   4.2 To check the status of AWS services, use the following command:
+   ```bash
+   python check_services.py <services>
+   ```
+   Replace <services> with a comma-separated list of the services you want to check. Available services are: s3, lambda, stepfunctions, dynamodb, iam.
+
+   4.3 Examples:
+   Check S3 Service:
+   ```bash
+   python check_services.py s3
+   ```
+   Output:
+    ```yaml Checking s3...
+    s3 service is running. Output: (list of S3 buckets or no data found if there are no buckets)
+    ```
         "stateMachines": []
     }
 
