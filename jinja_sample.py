@@ -14,6 +14,7 @@ CUSTOM_TEMPLATE_FILTERS = {
 class TemplateEngine:
     def __init__(self):
         self.env = Environment(loader=BaseLoader(), undefined=DebugUndefined)
+        # Add custom filters to the environment
         self.env.filters.update(CUSTOM_TEMPLATE_FILTERS)
     
     def fill(self, template: str, params: dict):
@@ -33,7 +34,7 @@ def create_template_request(template: str, params: dict) -> dict:
     
     return json.loads(filled_event)
 
-# Example usage
+# Example usage with 3 parameters
 template = """
 {
     "accountId": "{{ accountId }}",
