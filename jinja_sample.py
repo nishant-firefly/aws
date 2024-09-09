@@ -36,11 +36,11 @@ def create_template_request(template: str, params: dict) -> dict:
 # Example usage
 template = """
 {
-    "accountId": "{{accountId}}",
-    "sorId": "{{sorId}}",
-    "cardReferenceId": "{{ accountId, sorId, tokenizedOriginatingPlastic | build_card_reference_id }}",
+    "accountId": "{{ accountId }}",
+    "sorId": "{{ sorId }}",
+    "cardReferenceId": "{{ accountId | build_card_reference_id(sorId, tokenizedOriginatingPlastic) }}",
     "transaction": {
-        "claimTransactionId": "{{claimTransactionId}}"
+        "claimTransactionId": "{{ claimTransactionId }}"
     }
 }
 """
