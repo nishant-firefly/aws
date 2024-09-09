@@ -39,7 +39,7 @@ template = """
 {
     "accountId": "{{ accountId }}",
     "sorId": "{{ sorId }}",
-    "cardReferenceId": "{{ accountId | build_card_reference_id(sorId, tokenizedOriginatingPlastic) }}",
+    "cardReferenceId": "{{ build_card_reference_id(accountId, sorId, tokenizedOriginatingPlastic) }}",
     "transaction": {
         "claimTransactionId": "{{ claimTransactionId }}"
     }
