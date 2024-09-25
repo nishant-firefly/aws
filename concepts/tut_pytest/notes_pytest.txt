@@ -7,14 +7,16 @@ Pytest >
         https://github.com/nishant-firefly/aws/commit/918f1aeedbaef78736504e353f2374e971260227
 
     > Fixture Parameters:
+        https://github.com/nishant-firefly/aws/commit/3faa774f1f1b663cbdfbe718ed6b1208aaf8a663#diff-1b7c905c52349a8c2ce218b7d86140eb10efd8b9ec2e22cde05754d090fde487R7
 
 
     >Autouse Fixtures
     >Using conftest.py for Shared Fixtures
     >Fixture Finalization with request.addfinalizer
     >Using pytest.fixture(scope="session") for Expensive Resources
-    >Parameterizing Fixtures
 
+    About the different config and the options:
+ 
 
 Best Practices for Using Fixtures
     Reuse Fixtures: Use fixtures to set up common test data or environments that multiple tests can reuse.
@@ -28,3 +30,82 @@ Best Practices for Using Fixtures
     Isolate Tests: Ensure fixtures isolate each test, especially when working with shared resources like databases, to avoid test contamination.
 
     Leverage conftest.py: For reusable setups shared across multiple test modules, move fixture logic to conftest.py.
+
+
+
+
+*******About the Configurations Summary **************
+Key Differences:
+conftest.py:
+
+For dynamic logic (fixtures, hooks, plugins) and applies to specific directories.
+Written in Python, suitable for setting up test environments, managing dependencies, and modular fixtures.
+Config files (pytest.ini, setup.cfg, tox.ini):
+
+For global static options and general pytest behavior configuration.
+Defines default pytest behavior (e.g., ignoring directories, setting default verbosity) for the entire project.
+Conclusion:
+    Use conftest.py for per-directory dynamic test logic.
+    Use pytest.ini, setup.cfg, or tox.ini for global static settings like ignoring directories or setting command-line options across the project.
+
+##### pytest.ini
+[pytest]
+addopts = --maxfail=2 --verbose --ignore=tests/slow_tests
+testpaths = tests
+norecursedirs = .git venv build
+minversion = 6.0
+------------------------Explanation
+addopts: Specifies additional command-line options by default (e.g., fail after 2 errors, ignore certain folders).
+Example: --maxfail=2 --verbose
+testpaths: Defines which directories pytest should look for tests by default.
+Example: tests
+norecursedirs: Specifies directories pytest should ignore when searching for tests.
+Example: .git venv build
+minversion: Ensures pytest runs only if a certain minimum version is installed.
+Example: 6.0
+
+##### setup.cfg
+[tool:pytest]
+addopts = --cov=my_project --cov-report=term-missing
+testpaths = tests
+norecursedirs = .git node_modules
+python_files = test_*.py *_test.py
+------------------------Explanation
+addopts: Sets default options, here for coverage (--cov for code coverage, and --cov-report to show missing lines).
+Example: --cov=my_project --cov-report=term-missing
+testpaths: Limits pytest to specific test directories.
+Example: tests
+norecursedirs: Ignores certain directories during test discovery.
+Example: .git node_modules
+python_files: Specifies the file pattern for test discovery.
+Example: test_*.py *_test.py
+##### tox.ini
+[pytest]
+addopts = --strict-markers --tb=short
+testpaths = tests integration_tests
+norecursedirs = .git .tox dist
+markers = slow: marks tests as slow (deselect with '-m "not slow"')
+------------------------Explanation
+addopts: Adds default options like strict marker checking and shorter tracebacks.
+Example: --strict-markers --tb=short
+testpaths: Defines multiple test directories.
+Example: tests integration_tests
+norecursedirs: Excludes directories from recursion, like the .tox folder.
+Example: .git .tox dist
+markers: Custom test markers with descriptions (useful for grouping tests like slow).
+Example: slow: marks tests as slow
+
+
+
+*** Key Differences conftest.py and config files 
+
+conftest.py is used for dynamic logic (fixtures, hooks, plugins) and applies to specific directories.
+Written in Python, suitable for setting up test environments, managing dependencies, and modular fixtures.
+Config files (pytest.ini, setup.cfg, tox.ini):
+
+config files used for global static options and general pytest behavior configuration.
+Defines default pytest behavior (e.g., ignoring directories, setting default verbosity) for the entire project.
+
+
+
+
