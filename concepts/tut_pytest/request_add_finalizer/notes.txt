@@ -1,0 +1,15 @@
+In pytest, finalization is a critical step for cleaning up resources after a test or a fixture completes. 
+While using yield for setup and teardown is common, request.addfinalizer() provides more flexibility for 
+teardown logic. This method allows you to register one or multiple teardown functions, 
+which are executed after the test or fixture is done.
+
+When to Use request.addfinalizer:
+Multiple teardown steps: You can register more than one teardown function.
+Immediate finalization registration: You might want to register finalizers dynamically during the test setup.
+Non-yield scenarios: In cases where yield might not be appropriate or you need finer control over teardown.
+
+How request.addfinalizer Works
+    Setup: You perform setup tasks (e.g., opening a database connection).
+    Finalizer registration: You use request.addfinalizer() to register one or more teardown functions.
+    Teardown: After the test or fixture completes, the finalizer is called to perform the necessary cleanup.
+
