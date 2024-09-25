@@ -1,0 +1,85 @@
+C:\Users\nishu\workspace\aws\concepts\tut_behave>python -m behave
+Feature: User login functionality # login.feature:5
+
+[Setup] Starting scenario: Successful login
+
+  Background:   # login.feature:8
+
+  @positive
+  Scenario: Successful login                           # login.feature:13
+    Given the user is on the login page                # steps/login_steps.py:15
+    When the user enters valid credentials             # steps/login_steps.py:24
+    Then the user should be redirected to the homepage # steps/login_steps.py:52
+[Teardown] Finished scenario: Successful login
+
+[Setup] Starting scenario: Unsuccessful login with invalid credentials
+
+  @negative
+  Scenario: Unsuccessful login with invalid credentials  # login.feature:19
+    Given the user is on the login page                  # steps/login_steps.py:15
+    When the user enters invalid credentials             # steps/login_steps.py:32
+    Then the user should see an error message            # steps/login_steps.py:62
+[Teardown] Finished scenario: Unsuccessful login with invalid credentials
+
+[Setup] Starting scenario: Login with multiple invalid credentials -- @1.1
+
+  @negative @parameterized
+  Scenario Outline: Login with multiple invalid credentials -- @1.1   # login.feature:31
+    Given the user is on the login page                               # steps/login_steps.py:15
+    When the user enters "wronguser" and "wrongpass"                  # steps/login_steps.py:40
+    Then the user should see an error message                         # steps/login_steps.py:62
+[Teardown] Finished scenario: Login with multiple invalid credentials -- @1.1
+
+[Setup] Starting scenario: Login with multiple invalid credentials -- @1.2
+
+  @negative @parameterized
+  Scenario Outline: Login with multiple invalid credentials -- @1.2   # login.feature:32
+    Given the user is on the login page                               # steps/login_steps.py:15
+    When the user enters "testuser" and "wrongpass"                   # steps/login_steps.py:40
+    Then the user should see an error message                         # steps/login_steps.py:62
+[Teardown] Finished scenario: Login with multiple invalid credentials -- @1.2
+
+1 feature passed, 0 failed, 0 skipped
+4 scenarios passed, 0 failed, 0 skipped
+12 steps passed, 0 failed, 0 skipped, 0 undefined
+Took 0m0.000s
+
+
+================= Examples
+
+C:\Users\nishu\workspace\aws\concepts\tut_behave>python -m behave --tags=@positive
+Feature: User login functionality # login.feature:5
+
+[Setup] Starting scenario: Successful login
+
+  Background:   # login.feature:8
+
+  @positive
+  Scenario: Successful login                           # login.feature:13
+    Given the user is on the login page                # steps/login_steps.py:15
+    When the user enters valid credentials             # steps/login_steps.py:24
+    Then the user should be redirected to the homepage # steps/login_steps.py:52
+[Teardown] Finished scenario: Successful login
+
+  @negative
+  Scenario: Unsuccessful login with invalid credentials  # login.feature:19
+    Given the user is on the login page                  # None
+    When the user enters invalid credentials             # None
+    Then the user should see an error message            # None
+
+  @negative @parameterized
+  Scenario Outline: Login with multiple invalid credentials -- @1.1   # login.feature:31
+    Given the user is on the login page                               # None
+    When the user enters "wronguser" and "wrongpass"                  # None
+    Then the user should see an error message                         # None
+
+  @negative @parameterized
+  Scenario Outline: Login with multiple invalid credentials -- @1.2   # login.feature:32
+    Given the user is on the login page                               # None
+    When the user enters "testuser" and "wrongpass"                   # None
+    Then the user should see an error message                         # None
+
+1 feature passed, 0 failed, 0 skipped
+1 scenario passed, 0 failed, 3 skipped
+3 steps passed, 0 failed, 9 skipped, 0 undefined
+Took 0m0.000s
