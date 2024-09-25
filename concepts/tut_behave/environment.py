@@ -2,18 +2,14 @@
 
 def before_scenario(context, scenario):
     """
-    This hook runs before every scenario.
-    It's used here to initialize shared context or global state.
+    Set up before each scenario. Initialize shared state or global data.
     """
-    print(f"\n[Setup] Starting scenario: {scenario.name}")
-    context.browser = "Chrome"  # Simulated browser (for demo purposes)
-    context.logged_in = False
+    print(f"Setting up scenario: {scenario.name}")
+    context.browser = "Chrome"  # Example of global context for all scenarios
 
 def after_scenario(context, scenario):
     """
-    This hook runs after every scenario.
-    It's used here to clean up any resources initialized during the test.
+    Clean up after each scenario.
     """
-    print(f"[Teardown] Finished scenario: {scenario.name}")
-    context.browser = None  # Clean up the browser
-    context.logged_in = False
+    print(f"Teardown after scenario: {scenario.name}")
+    context.browser = None  # Clear shared state

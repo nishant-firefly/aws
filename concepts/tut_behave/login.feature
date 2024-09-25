@@ -1,32 +1,27 @@
-# Background: The Given step to navigate to the login page is common for all scenarios, so we use a background to avoid repetition.
-# Scenario Outline: The Scenario Outline is used to test multiple sets of invalid credentials without repeating the steps.
-# Tags: We use tags like @positive, @negative, and @parameterized to categorize tests and selectively run specific scenarios.
+# features/login.feature
 
-Feature: User login functionality
+Feature: User login functionality with and without context
 
-  # Background: Common setup for all scenarios in this feature
   Background:
     Given the user is on the login page
 
-  # Scenario to test successful login
-  @positive
-  Scenario: Successful login
+  # Scenario using context to share data across steps
+  Scenario: Successful login using context
     When the user enters valid credentials
     Then the user should be redirected to the homepage
 
-  # Scenario to test unsuccessful login with invalid credentials
-  @negative
-  Scenario: Unsuccessful login with invalid credentials
-    When the user enters invalid credentials
+  # Scenario using direct assertions without context
+  Scenario: Unsuccessful login without context
+    When the user enters invalid credentials directly
     Then the user should see an error message
 
-  # Scenario Outline: Tests multiple sets of credentials using examples
-  @negative @parameterized
-  Scenario Outline: Login with multiple invalid credentials
-    When the user enters "<username>" and "<password>"
+  # Scenario outline using both context and non-context for invalid credentials
+  Scenario Outline: Login attempts with different invalid credentials
+    When the user enters "<username>" and "<password>" using context
     Then the user should see an error message
 
     Examples:
       | username    | password    |
       | wronguser   | wrongpass   |
       | testuser    | wrongpass   |
+
