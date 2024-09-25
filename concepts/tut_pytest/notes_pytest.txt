@@ -1,0 +1,26 @@
+Pytest >
+    > fixture scope
+        https://github.com/nishant-firefly/aws/commit/e564add5b862d09276e262fba965a64d9fb48678
+    > fixture yield (set up and tear down) 
+
+    > Fixture Parameters:
+    >Using One Fixture in Another Fixture (Fixture Chaining):
+    >Autouse Fixtures
+    >Using conftest.py for Shared Fixtures
+    >Fixture Finalization with request.addfinalizer
+    >Using pytest.fixture(scope="session") for Expensive Resources
+    >Parameterizing Fixtures
+
+
+    Best Practices for Using Fixtures
+Reuse Fixtures: Use fixtures to set up common test data or environments that multiple tests can reuse.
+
+Keep Fixtures Modular: Break down complex setups into smaller fixtures and combine them when necessary.
+
+Use scope Appropriately: Select the right scope for each fixture based on your testing needs (e.g., session-scoped for database connections, function-scoped for isolated tests).
+
+Avoid Overuse of autouse: Use autouse fixtures sparingly to avoid unintended side effects in tests. It’s better to explicitly declare dependencies.
+
+Isolate Tests: Ensure fixtures isolate each test, especially when working with shared resources like databases, to avoid test contamination.
+
+Leverage conftest.py: For reusable setups shared across multiple test modules, move fixture logic to conftest.py.
