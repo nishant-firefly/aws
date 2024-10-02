@@ -1,0 +1,35 @@
+{
+    "Comment": "Generic Step Function",
+    "StartAt": "InitialState",
+    "States": {
+      "InitialState": {
+        "Type": "Task", 
+        "Resource": "arn:aws:service:region:account-id:function-name",
+        "Next": "NextState"
+      },
+      "NextState": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.condition",
+            "StringEquals": "value",
+            "Next": "SuccessState"
+          },
+          {
+            "Variable": "$.condition",
+            "StringEquals": "other_value",
+            "Next": "FailState"
+          }
+        ]
+      },
+      "SuccessState": {
+        "Type": "Succeed"
+      },
+      "FailState": {
+        "Type": "Fail",
+        "Error": "FailureType",
+        "Cause": "Detailed failure reason"
+      }
+    }
+  }
+  

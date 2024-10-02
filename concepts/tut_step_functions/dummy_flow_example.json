@@ -1,0 +1,391 @@
+{
+    "Comment": "Full Workflow with Parallel Master Fetch, Parallel Actions, DynamoDB Logging, and Status Check",
+    "StartAt": "Initialize",
+    "States": {
+      "Initialize": {
+        "Type": "Pass",
+        "ResultPath": "$.fulfillmentCoordinatorID",
+        "Parameters": {
+          "fulfillmentCoordinatorID.$": "States.UUID()"
+        },
+        "Next": "ParallelMasterDataFetch"
+      },
+      "ParallelMasterDataFetch": {
+        "Type": "Parallel",
+        "Branches": [
+          {
+            "StartAt": "CallClaimSOR",
+            "States": {
+              "CallClaimSOR": {
+                "Type": "Task",
+                "Resource": "arn:aws:lambda:us-east-1:123456789012:function:GenericAPICallLambda",
+                "Parameters": {
+                  "templateName": "ClaimSOR",
+                  "method": "GET",
+                  "params": {
+                    "claimID.$": "$.claimID"
+                  }
+                },
+                "Next": "TransformClaimSOR"
+              },
+              "TransformClaimSOR": {
+                "Type": "Pass",
+                "Parameters": {
+                  "transformedClaimID.$": "States.Format('ClaimID: {} Transformed', $.claimID)"
+                },
+                "Next": "WriteClaimSORResult"
+              },
+              "WriteClaimSORResult": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::dynamodb:updateItem",
+                "Parameters": {
+                  "TableName": "transaction_meta",
+                  "Key": {
+                    "PK": {
+                      "S.$": "States.Format('{}#ClaimSOR', $.fulfillmentCoordinatorID)"
+                    },
+                    "SK": {
+                      "S": "ClaimSOR"
+                    }
+                  },
+                  "UpdateExpression": "SET #status = :status",
+                  "ExpressionAttributeNames": {
+                    "#status": "Status"
+                  },
+                  "ExpressionAttributeValues": {
+                    ":status": {
+                      "S": "Success"
+                    }
+                  }
+                },
+                "End": true
+              }
+            }
+          },
+          {
+            "StartAt": "CallEnrichment",
+            "States": {
+              "CallEnrichment": {
+                "Type": "Task",
+                "Resource": "arn:aws:lambda:us-east-1:123456789012:function:GenericAPICallLambda",
+                "Parameters": {
+                  "templateName": "Enrichment",
+                  "method": "GET",
+                  "params": {
+                    "claimID.$": "$.claimID"
+                  }
+                },
+                "Next": "TransformEnrichment"
+              },
+              "TransformEnrichment": {
+                "Type": "Pass",
+                "Parameters": {
+                  "enrichedClaim.$": "States.Format('Enriched claim data: {}', $.claimID)"
+                },
+                "Next": "WriteEnrichmentResult"
+              },
+              "WriteEnrichmentResult": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::dynamodb:updateItem",
+                "Parameters": {
+                  "TableName": "transaction_meta",
+                  "Key": {
+                    "PK": {
+                      "S.$": "States.Format('{}#Enrichment', $.fulfillmentCoordinatorID)"
+                    },
+                    "SK": {
+                      "S": "Enrichment"
+                    }
+                  },
+                  "UpdateExpression": "SET #status = :status",
+                  "ExpressionAttributeNames": {
+                    "#status": "Status"
+                  },
+                  "ExpressionAttributeValues": {
+                    ":status": {
+                      "S": "Success"
+                    }
+                  }
+                },
+                "End": true
+              }
+            }
+          },
+          {
+            "StartAt": "CallCreditCard",
+            "States": {
+              "CallCreditCard": {
+                "Type": "Task",
+                "Resource": "arn:aws:lambda:us-east-1:123456789012:function:GenericAPICallLambda",
+                "Parameters": {
+                  "templateName": "CreditCard",
+                  "method": "GET",
+                  "params": {
+                    "transactionID.$": "$.transactionID"
+                  }
+                },
+                "Next": "TransformCreditCard"
+              },
+              "TransformCreditCard": {
+                "Type": "Pass",
+                "Parameters": {
+                  "creditCardDetails.$": "States.Format('Credit card info: {}', $.transactionID)"
+                },
+                "Next": "WriteCreditCardResult"
+              },
+              "WriteCreditCardResult": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::dynamodb:updateItem",
+                "Parameters": {
+                  "TableName": "transaction_meta",
+                  "Key": {
+                    "PK": {
+                      "S.$": "States.Format('{}#CreditCard', $.fulfillmentCoordinatorID)"
+                    },
+                    "SK": {
+                      "S": "CreditCard"
+                    }
+                  },
+                  "UpdateExpression": "SET #status = :status",
+                  "ExpressionAttributeNames": {
+                    "#status": "Status"
+                  },
+                  "ExpressionAttributeValues": {
+                    ":status": {
+                      "S": "Success"
+                    }
+                  }
+                },
+                "End": true
+              }
+            }
+          }
+        ],
+        "Next": "ParallelFinancialActions"
+      },
+      "ParallelFinancialActions": {
+        "Type": "Parallel",
+        "Branches": [
+          {
+            "StartAt": "CheckFinancialTransaction",
+            "States": {
+              "CheckFinancialTransaction": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::dynamodb:getItem",
+                "Parameters": {
+                  "TableName": "transaction_meta",
+                  "Key": {
+                    "PK": {
+                      "S.$": "States.Format('{}#FinancialTransaction', $.fulfillmentCoordinatorID)"
+                    },
+                    "SK": {
+                      "S": "FinancialTransaction"
+                    }
+                  }
+                },
+                "ResultPath": "$.transactionCheck",
+                "Next": "IsFinancialTransactionCalled"
+              },
+              "IsFinancialTransactionCalled": {
+                "Type": "Choice",
+                "Choices": [
+                  {
+                    "Variable": "$.transactionCheck.Item",
+                    "IsNull": true,
+                    "Next": "CallFinancialTransaction"
+                  },
+                  {
+                    "Variable": "$.transactionCheck.Item",
+                    "IsNull": false,
+                    "Next": "SkipFinancialTransaction"
+                  }
+                ]
+              },
+              "CallFinancialTransaction": {
+                "Type": "Task",
+                "Resource": "arn:aws:lambda:us-east-1:123456789012:function:GenericAPICallLambda",
+                "Parameters": {
+                  "templateName": "FinancialTransaction",
+                  "method": "POST",
+                  "params": {
+                    "transactionID.$": "$.transactionID",
+                    "amount.$": "$.amount"
+                  }
+                },
+                "Next": "WriteFinancialTransactionResult"
+              },
+              "WriteFinancialTransactionResult": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::dynamodb:updateItem",
+                "Parameters": {
+                  "TableName": "transaction_meta",
+                  "Key": {
+                    "PK": {
+                      "S.$": "States.Format('{}#FinancialTransaction', $.fulfillmentCoordinatorID)"
+                    },
+                    "SK": {
+                      "S": "FinancialTransaction"
+                    }
+                  },
+                  "UpdateExpression": "SET #status = :status, AmountProcessed = :amount",
+                  "ExpressionAttributeNames": {
+                    "#status": "Status"
+                  },
+                  "ExpressionAttributeValues": {
+                    ":status": {
+                      "S": "Success"
+                    },
+                    ":amount": {
+                      "N.$": "$.amount"
+                    }
+                  }
+                },
+                "End": true
+              },
+              "SkipFinancialTransaction": {
+                "Type": "Pass",
+                "End": true
+              }
+            }
+          },
+          {
+            "StartAt": "CheckSendLetter",
+            "States": {
+              "CheckSendLetter": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::dynamodb:getItem",
+                "Parameters": {
+                  "TableName": "transaction_meta",
+                  "Key": {
+                    "PK": {
+                      "S.$": "States.Format('{}#SendLetter', $.fulfillmentCoordinatorID)"
+                    },
+                    "SK": {
+                      "S": "SendLetter"
+                    }
+                  }
+                },
+                "ResultPath": "$.letterCheck",
+                "Next": "IsSendLetterCalled"
+              },
+              "IsSendLetterCalled": {
+                "Type": "Choice",
+                "Choices": [
+                  {
+                    "Variable": "$.letterCheck.Item",
+                    "IsNull": true,
+                    "Next": "CallSendLetter"
+                  },
+                  {
+                    "Variable": "$.letterCheck.Item",
+                    "IsNull": false,
+                    "Next": "SkipSendLetter"
+                  }
+                ]
+              },
+              "CallSendLetter": {
+                "Type": "Task",
+                "Resource": "arn:aws:lambda:us-east-1:123456789012:function:GenericAPICallLambda",
+                "Parameters": {
+                  "templateName": "SendLetter",
+                  "method": "POST",
+                  "params": {
+                    "claimID.$": "$.claimID"
+                  }
+                },
+                "Next": "WriteSendLetterResult"
+              },
+              "WriteSendLetterResult": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::dynamodb:updateItem",
+                "Parameters": {
+                  "TableName": "transaction_meta",
+                  "Key": {
+                    "PK": {
+                      "S.$": "States.Format('{}#SendLetter', $.fulfillmentCoordinatorID)"
+                    },
+                    "SK": {
+                      "S": "SendLetter"
+                    }
+                  },
+                  "UpdateExpression": "SET #status = :status",
+                  "ExpressionAttributeNames": {
+                    "#status": "Status"
+                  },
+                  "ExpressionAttributeValues": {
+                    ":status": {
+                      "S": "Success"
+                    }
+                  }
+                },
+                "End": true
+              },
+              "SkipSendLetter": {
+                "Type": "Pass",
+                "End": true
+              }
+            }
+          }
+        ],
+        "Next": "CheckFailures"
+      },
+      "CheckFailures": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.status",
+            "StringEquals": "Failed",
+            "Next": "RetryFailedServices"
+          },
+          {
+            "Variable": "$.status",
+            "StringEquals": "Success",
+            "Next": "AllServicesSuccess"
+          }
+        ]
+      },
+      "RetryFailedServices": {
+        "Type": "Parallel",
+        "Branches": [
+          {
+            "StartAt": "RetryFinancialTransaction",
+            "States": {
+              "RetryFinancialTransaction": {
+                "Type": "Task",
+                "Resource": "arn:aws:lambda:us-east-1:123456789012:function:GenericAPICallLambda",
+                "Parameters": {
+                  "templateName": "FinancialTransaction",
+                  "method": "POST",
+                  "params": {
+                    "transactionID.$": "$.transactionID"
+                  }
+                },
+                "End": true
+              }
+            }
+          },
+          {
+            "StartAt": "RetrySendLetter",
+            "States": {
+              "RetrySendLetter": {
+                "Type": "Task",
+                "Resource": "arn:aws:lambda:us-east-1:123456789012:function:GenericAPICallLambda",
+                "Parameters": {
+                  "templateName": "SendLetter",
+                  "method": "POST",
+                  "params": {
+                    "claimID.$": "$.claimID"
+                  }
+                },
+                "End": true
+              }
+            }
+          }
+        ],
+        "Next": "AllServicesSuccess"
+      },
+      "AllServicesSuccess": {
+        "Type": "Succeed"
+      }
+    }
+  }
