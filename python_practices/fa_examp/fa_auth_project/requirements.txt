@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+bcrypt
+python-jose
+aiofiles
+jinja2
+passlib
+sqlalchemy
+aiosqlite
