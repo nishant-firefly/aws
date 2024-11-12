@@ -163,3 +163,25 @@ def read_users_me(current_user: dict = Depends(get_current_user)):
 # await: Used to wait for asynchronous tasks to complete.
 # python -m pip install fastapi 
 #python -m uvicorn basics_main:app --reload
+
+""" Some more basics for reference
+Example: Test API Endpoint
+from fastapi.testclient import TestClient
+client = TestClient(app)
+def test_read_root():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Hello, FastAPI!"}
+
+Versioning
+You can version your API by adding version numbers to the path.
+Example: API Versioning
+@app.get("/v1/items/{item_id}")
+def get_item_v1(item_id: int):
+    return {"item_id": item_id}
+
+@app.get("/v2/items/{item_id}")
+def get_item_v2(item_id: int):
+    return {"item_id": item_id, "new_feature": "added"}
+
+"""
