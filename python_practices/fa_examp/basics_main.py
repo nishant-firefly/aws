@@ -87,6 +87,60 @@ def get_item(item_id: int):
         raise HTTPException(status_code=404, detail={"error":"Item not found","concept":"HttpException: Allows you to raise errors with a specific status code and message."})
     return {"item_id": item_id, "name": db[item_id]}
 
+# Upload File
+from fastapi import File, UploadFile, HTTPException
+# Prequiste : pip install python-multipart
+# pip install python-magic
+import magic
+ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif"}
+ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/gif"}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB limit
+# Function to validate file type and size
+def validate_file(file: UploadFile):
+    # Check file extension
+    ext = file.filename.split('.')[-1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file extension. Allowed extensions: {', '.join(ALLOWED_EXTENSIONS)}"
+        )
+
+    # Check MIME type using python-magic
+    mime = magic.Magic(mime=True)
+    file_mime_type = mime.from_buffer(file.file.read(1024))  # Read the first 1KB for magic signature
+    file.file.seek(0)  # Reset the file pointer after reading
+
+    if file_mime_type not in ALLOWED_MIME_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed types: {', '.join(ALLOWED_MIME_TYPES)}"
+        )
+    # Check file size
+    if len(file.file.read()) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail="File size exceeds the 5MB limit."
+        )
+    # V.imp without this size will be 0 every time file passed and read should be set to zero
+    file.file.seek(0)  
+
+@app.post("/uploadfile/")
+async def upload_file(file: UploadFile = File(...)):
+    validate_file(file)
+    # Also if try validate_file return content and use with await will get following error 
+    """
+    es\Python312\site-packages\fastapi\routing.py", line 159, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nishu\workspace\aws\python_practices\fa_examp\basics_main.py", line 130, in upload_file
+    content = await validate_file(file)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: object bytes can't be used in 'await' expression
+    """
+    content = await file.read()
+    print(content)
+    return {"filename": file.filename, "file_size": len(content)}
+
 
 ########### TODOs FOllowing The Admin pop up working but not available
 from fastapi import Depends, HTTPException, status
