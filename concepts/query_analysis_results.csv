@@ -1,0 +1,20 @@
+Query Name,Query Text,Execution Time (ms),Planning Time (ms),Total Cost
+Query 1: Subquery with WHERE,"SELECT first_name, last_name, salary
+            FROM employees
+            WHERE salary > (SELECT AVG(salary) FROM employees);",0.094,0.633,12.39..24.76
+Query 2: Common Table Expression (CTE),"WITH avg_salary_cte AS (
+                SELECT AVG(salary) AS avg_salary FROM employees
+            )
+            SELECT first_name, last_name, salary
+            FROM employees, avg_salary_cte
+            WHERE salary > avg_salary_cte.avg_salary;",0.026,0.189,12.38..26.66
+Query 3: Derived Table,"SELECT e.first_name, e.last_name, e.salary, avg_salary.avg_salary
+            FROM employees e
+            JOIN (SELECT AVG(salary) AS avg_salary FROM employees) avg_salary
+            ON e.salary > avg_salary.avg_salary;",0.033,0.065,12.38..26.66
+CTE Query,"WITH avg_salary_cte AS (
+                SELECT AVG(salary) AS avg_salary FROM employees
+            )
+            SELECT first_name, last_name, salary, avg_salary_cte.avg_salary
+            FROM employees, avg_salary_cte
+            WHERE salary > avg_salary_cte.avg_salary;",0.022,0.051,12.38..26.66
