@@ -1,0 +1,9 @@
+npm install -g typescript
+tsc --version
+mkdir my-typescript-app
+cd my-typescript-app
+npm init -y
+# npm install typescript --save-dev # Install TypeScript locally:
+# Create typescriptconfiguration file 
+npx tsc --init
+
