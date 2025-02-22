@@ -1,0 +1,18 @@
+services:
+  react-app:
+    container_name: react-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app  # Mounts the project folder (live reload)
+      - /app/node_modules  # Prevents overwriting node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true  # Helps detect file changes inside Docker
+      # However without CHOKIDAR_USEPOLLING and WATCHPACK_POLLING HMR working fine.      
+      - WATCHPACK_POLLING=true  # Alternative file watcher
+
+    command: ["npm", "run", "dev", "--", "--host"]
