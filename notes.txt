@@ -1,27 +1,44 @@
+// Loop through all collections in the current database
+db.getCollectionNames().forEach(function(collectionName) {
+  print("\nCollection: " + collectionName);
+  
+  // Use an aggregation pipeline to extract keys from each document,
+  // filter keys starting with "n", and then group unique keys.
+  const result = db.getCollection(collectionName).aggregate([
+    {
+      $project: {
+        // Convert the document into an array of key-value pairs.
+        fields: { $objectToArray: "$$ROOT" }
+      }
+    },
+    // Unwind the array to get one document per field
+    { $unwind: "$fields" },
+    // Filter for keys that start with "n" (case-insensitive)
+    { $match: { "fields.k": { $regex: "^n", $options: "i" } } },
+    // Group all matching keys into a single set to avoid duplicates
+    { $group: { _id: null, keys: { $addToSet: "$fields.k" } } }
+  ]).toArray();
 
-############ 
-# Removes all stopped containers.
-docker container prune -f 
-# Removes all unused networks. An unused network is a network that is not used by any container.
-docker network prune -f
-# Removes all dangling images. A dangling image is an image that is not tagged and is not referenced by any container.
-docker image prune -f
-#  Removes all unused volumes. An unused volume is a volume that is not referenced by any container.
-docker volume prune -f
-# Removes all unused data, including stopped containers, unused networks, dangling images, and unused volumes.
-docker system prune -af
+  // Print the results for this collection.
+  if (result.length > 0) {
+    print("Fields starting with 'n':");
+    printjson(result[0].keys);
+  } else {
+    print("No fields starting with 'n' found.");
+  }
+});
 
-# Stop all running containers:
-docker stop $(docker ps -aq)
-# Remove all containers:
-docker rm $(docker ps -aq)
-# Remove all images:
-docker rmi -f $(docker images -aq)
-# Remove all volumes:
-docker volume rm $(docker volume ls -q)
-#Remove all networks:
-docker network rm $(docker network ls -q)
-# Remove dangling images, containers, volumes, and networks:
-docker system prune -af --volumes
 
-test
+///////// Function to Get collection Names starting with n 
+
+
+
+
+
+
+
+
+
+
+
+
